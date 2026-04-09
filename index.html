@@ -6,18 +6,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; }
 
-    /* Real saladdays site - on TOP, nearly invisible, catches all clicks */
-    #real-iframe {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      border: none;
-      opacity: 0;
-      z-index: 9999;
-      pointer-events: all;
-    }
-
-    /* Saladdays background - fully visible, no overlay */
+    /* Saladdays background - fully visible, fully interactive */
     #bg-iframe {
       position: fixed;
       top: 0; left: 0;
@@ -25,7 +14,7 @@
       border: none;
       opacity: 1;
       z-index: 1;
-      pointer-events: none;
+      pointer-events: all;
     }
 
     /* Popup modal - pointer-events none so clicks pass through to real iframe */
@@ -137,9 +126,6 @@
 
   <!-- X button: outside popup, in root stacking context, above everything -->
   <button id="close-btn" onclick="window.location.href='https://www.saladdays.co'">&#x2715;</button>
-
-  <!-- Layer 4: real iframe on TOP, nearly invisible, catches all real clicks -->
-  <iframe id="real-iframe" src="https://www.saladdays.co"></iframe>
 
   <script>
     // Countdown timer for urgency
