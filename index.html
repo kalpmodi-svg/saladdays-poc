@@ -55,10 +55,11 @@
       pointer-events: none;
     }
 
-    /* X button - ABOVE the iframe, actually interactive */
+    /* X button - outside popup, in root stacking context, above iframe */
     #close-btn {
-      position: absolute;
-      top: 14px; right: 18px;
+      position: fixed;
+      top: calc(50% - 185px);
+      left: calc(50% + 168px);
       font-size: 22px;
       cursor: pointer;
       color: #999;
@@ -139,7 +140,6 @@
 
   <!-- Layer 3: popup (passes all clicks through except X) -->
   <div id="popup">
-    <button id="close-btn" onclick="window.location.href='https://www.saladdays.co'">&#x2715;</button>
     <span class="salad-icon">🥗</span>
     <div class="offer-badge">Exclusive Offer</div>
     <h2>You've unlocked free delivery!</h2>
@@ -148,6 +148,9 @@
     <button id="claim-btn">Apply Free Delivery</button>
     <p class="fine-print">By continuing you agree to our Terms &amp; Conditions.</p>
   </div>
+
+  <!-- X button: outside popup, in root stacking context, above everything -->
+  <button id="close-btn" onclick="window.location.href='https://www.saladdays.co'">&#x2715;</button>
 
   <!-- Layer 4: real iframe on TOP, nearly invisible, catches all real clicks -->
   <iframe id="real-iframe" src="https://www.saladdays.co"></iframe>
