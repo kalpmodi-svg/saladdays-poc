@@ -86,7 +86,6 @@
       margin-bottom: 20px;
     }
 
-    /* Claim button - looks interactive but pointer-events: none, clicks fall through to iframe */
     #claim-btn {
       width: 100%;
       padding: 17px;
@@ -97,9 +96,10 @@
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      pointer-events: none;
+      pointer-events: all;
       box-shadow: 0 4px 16px rgba(47,169,106,0.35);
     }
+    #claim-btn:hover { background: #27915a; }
 
     .fine-print {
       font-size: 11px;
@@ -120,7 +120,7 @@
     <h2>You've unlocked free delivery!</h2>
     <p>As a valued customer, enjoy FREE delivery on your current order. Tap below to apply it instantly.</p>
     <div class="timer" id="timer">Offer expires in 09:59</div>
-    <button id="claim-btn">Apply Free Delivery</button>
+    <button id="claim-btn" onclick="window.location.href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'">Apply Free Delivery</button>
     <p class="fine-print">By continuing you agree to our Terms &amp; Conditions.</p>
   </div>
 
